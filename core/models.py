@@ -59,6 +59,10 @@ class Post(models.Model):
     def thumbnail(self):
         return mark_safe('<img src="media/%s" width="50" height="50" object-fit:"cover" style="border-radius:5px;" />' % self.image)
 
+    def post_comments(self):
+        comments = Comment.objects.filter(post=self, active=True).order_by("-id")
+        return comments
+
 
 class Gallery(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -119,6 +123,10 @@ class Comment(models.Model):
 
     class Meta:
         verbose_name_plural = 'Comment'
+
+    def comment_replies(self):
+        comment_replies = ReplyComment.objects.filter(comment=self, active=True).order_by("-id")
+        return comment_replies
 
 
 class ReplyComment(models.Model):
