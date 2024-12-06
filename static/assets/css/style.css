@@ -7514,6 +7514,7 @@ header .header_inner .right_side {
     width: 100%;
     image-rendering: -webkit-optimize-contrast;
     border-radius: 50%;
+    height: 95%;
 }
 
 .header_dropdown ul li a .drop_avatar::after {

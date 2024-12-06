@@ -9,8 +9,23 @@ https://docs.djangoproject.com/en/3.2/howto/deployment/wsgi/
 
 import os
 
+import django
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'facebook_prj.settings')
 
-application = get_wsgi_application()
+django.setup()
+
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from core.routing import websocket_urlpatterns
+
+application = ProtocolTypeRouter({
+    'http': get_wsgi_application(),
+    'https': get_wsgi_application(),
+    'websocket': AuthMiddlewareStack(
+        URLRouter(
+            websocket_urlpatterns
+        )
+    )
+})

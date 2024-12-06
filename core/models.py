@@ -295,3 +295,26 @@ class PagePost(models.Model):
         return mark_safe(
             '<img src="/media/%s" width="50" height="50" object-fit:"cover" style="border-radius:5px;" />'
             % self.image)
+
+
+class ChatMessage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="chat_user")
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="chat_sender")
+    receiver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="chat_receiver")
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    date = models.DateTimeField(auto_now_add=True)
+    mid = ShortUUIDField(length=7, max_length=25, alphabet='abcdefghijklmnopqrstuvwxyz')
+    conversation_id = models.CharField(max_length=255, editable=False)
+
+    def save(self, *args, **kwargs):
+        # Gera uma chave única para a conversa, independente da ordem
+        sorted_ids = sorted([self.sender.id, self.receiver.id])
+        self.conversation_id = f"{sorted_ids[0]}_{sorted_ids[1]}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"From {self.sender.full_name} to {self.receiver.full_name}"
+
+    class Meta:
+        verbose_name = 'Chat Message'

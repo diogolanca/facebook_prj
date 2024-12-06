@@ -84,9 +84,9 @@ $(document).ready(function(){
                     </div>\
                     <div class="p-4 space-y-3">\
                         <div class="flex space-x-4 lg:font-bold">\
-                            <a  class="flex items-center space-x-2  text-blue-500" style="cursor: pointer;" >\
-                                <div class="p-2 rounded-full like-btn'+res.post.id+' text-black " id="like-btn" data-like-btn="'+res.post.id+'">\
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="22" height="22" class="dark:text-blue-100">\
+                            <a style="cursor: pointer;" class="flex items-center space-x-2">\
+                                <div class="p-2 rounded-full like-btn' + res.post.id + ' {% if request.user in p.likes.all %} text-blue-500 {% else %} text-black {% endif %}" id="like-btn" data-like-btn="' + res.post.id + '">\
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="22" height="22" class="dark:text-gray-100">\
                                         <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />\
                                     </svg>\
                                 </div>\
@@ -98,7 +98,7 @@ $(document).ready(function(){
                                         <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clip-rule="evenodd" />\
                                     </svg>\
                                 </div>\
-                                <div> <b><span id="comment-count'+res.post.id+'">0</span></b> Comment</div>\
+                                <div><span id="comment-count' + res.post.id + '">0</span> Comment</div>\
                             </a>\
                             <a href="#" class="flex items-center space-x-2 flex-1 justify-end">\
                                 <div class="p-2 rounded-full  text-black lg:bg-gray-100 dark:bg-gray-600">\
@@ -110,24 +110,25 @@ $(document).ready(function(){
                             </a>\
                         </div>\
                         <div class="flex items-center space-x-3 pt-2">\
-                            \
                             <div class="dark:text-gray-100">\
-                                <strong><span id="like-count'+res.post.id+'">0</span></strong> Likes\
+                                <strong> <span id="like-count' + res.post.id + '">{{p.likes.all.count}}</span></strong> Likes\
                             </div>\
                         </div>\
-                        <div class="border-t py-4 space-y-4 dark:border-gray-600" id="comment-div'+res.post.id+'">\
-                        </div>\
-                            <a href="#" class="hover:text-blue-600 hover:underline">No Comments </a>\
-                            <div class="bg-gray-100 rounded-full relative dark:bg-gray-800 border-t">\
-                                <input placeholder="Add your Comment..." id="comment-input'+res.post.id+'" data-comment-input="'+res.post.id+'" class="bg-transparent max-h-10 shadow-none px-5 comment-input'+res.post.id+'">\
-                                <div class="-m-0.5 absolute bottom-0 flex items-center right-3 text-xl">\
-                                    <a style="cursor: pointer;" id="comment-btn" class="comment-btn'+res.post.id+'" data-comment-btn="'+res.post.id+'">\
-                                        <ion-icon name="send-outline" class="hover:bg-gray-200 p-1.5 rounded-full"></ion-icon>\
-                                    </a>\
-                                </div>\
+                        <div class="bg-gray-100 rounded-full relative dark:bg-gray-800 border-t">\
+                            <input placeholder="Add your Comment.." id="comment-input' + res.post.id + '" data-comment-input="' + res.post.id + '" class="bg-transparent max-h-10 shadow-none px-5 comment-input' + res.post.id + '">\
+                            <div class="-m-0.5 absolute bottom-0 flex items-center right-3 text-xl">\
+                                {% comment %}<a href="#">\
+                                    <ion-icon name="happy-outline" class="hover:bg-gray-200 p-1.5 rounded-full"></ion-icon>\
+                                </a>\
+                                <a href="#">\
+                                    <ion-icon name="image-outline" class="hover:bg-gray-200 p-1.5 rounded-full"></ion-icon>\
+                                </a>{% endcomment %}\
+                                <a style="cursor: pointer;" id="comment-btn" class="comment-btn' + res.post.id + '" data-comment-btn="' + res.post.id + '">\
+                                    <ion-icon name="send" class="hover:bg-gray-200 p-1.5 rounded-full"></ion-icon>\
+                                </a>\
                             </div>\
                         </div>\
-                </div>\
+                    </div>\
                     ';
                 
                 $(".post-div").prepend(_html);
@@ -264,5 +265,129 @@ $(document).ready(function(){
                 $("#reply-input"+id).val("")
             }
         })
+    })
+
+    // Delete Comment
+    $(document).on("click", "#delete-comment", function (){
+        let id = $(this).attr("data-delete-comment")
+        console.log(id)
+
+        $.ajax({
+            url: "/delete_comment/",
+            dataType: "json",
+            data: {
+                "id": id
+            },
+            success: function (response){
+                console.log("Comment ", id, " Deleted");
+                $("#comment-div"+id).addClass("d-none")
+            }
+        })
+    })
+
+    // Add Friend
+    $(document).on("click", "#add-friend", function (){
+        let id = $(this).attr("data-friend-id")
+        console.log("Added " + id + " as a Friend");
+
+        $.ajax({
+            url: "/add_friend/",
+            dataType: "json",
+            data: {
+                "id": id
+            },
+            success: function (resp){
+                console.log(resp);
+                if (resp.bool === true){
+                    $("#friend-text").html('<i class="fas fa-user-minus"></i> Cancel Request')
+                    $(".add-friend"+id).addClass("bg-red-600")
+                    $(".add-friend"+id).removeClass("bg-blue-600")
+                }
+                if (resp.bool === false){
+                    $("#friend-text").html('<i class="fas fa-user-plus"></i> Add Friend')
+                    $(".add-friend"+id).addClass("bg-blue-600")
+                    $(".add-friend"+id).removeClass("bg-red-600")
+                }
+            }
+        })
+    })
+
+    // Accept Friend Request
+    $(document).on("click", "#accept-friend-request", function (){
+        let id = $(this).attr("data-request-id");
+        console.log(id);
+
+        $.ajax({
+            url: "/accept_friend_request/",
+            dataType: "json",
+            data: {
+                "id": id
+            },
+            success: function (resp){
+                console.log(resp);
+                $(".reject-friend-request-hide"+id).hide()
+                $(".accept-friend-request"+id).html('<i class="fas fa-check-circle"></i> Friend Request Accepted')
+            }
+        })
+    })
+
+    // Reject Friend Request
+    $(document).on("click", "#reject-friend-request", function (){
+        let id = $(this).attr("data-request-id");
+        console.log(id);
+
+        $.ajax({
+            url: "/reject_friend_request/",
+            dataType: "json",
+            data: {
+                "id": id
+            },
+            success: function (resp){
+                console.log(resp);
+                $(".accept-friend-request-hide"+id).hide()
+                $(".reject-friend-request"+id).html('<i class="fas fa-check-circle"></i> Friend Request Rejected')
+            }
+        })
+    })
+
+    // Unfriend
+    $(document).on("click", "#unfriend", function (){
+        let id = $(this).attr("data-unfriend")
+        console.log(id);
+
+        $.ajax({
+            url: "/unfriend/",
+            dataType: "json",
+            data: {
+                "id": id
+            },
+            success: function (resp){
+                console.log(resp);
+                $("#unfriend-text").html('<i class="fas fa-check-circle"></i> Friend Removed')
+                $(".unfriend"+id).addClass("bg-green-600")
+                $(".unfriend"+id).removeClass("bg-red-600")
+            }
+        })
+    })
+
+    // Block User
+    $(document).on("click", '#block-user-btn', function(){
+        let id = $(this).attr("data-block-user");
+        
+        $.ajax({
+            url:"/block_user/",
+            dataType:"json",
+            beforeSend: function(){
+                $("#block-user-btn").html("<i class='fas fa-spinner fa-spin'></i>")
+            },
+            data: {
+                "id":id
+            },
+            success: function(response) {
+                console.log(response);
+                $(".block-text"+id).html("<i class='fas fa-check-circle'></i> User Blocked")
+            }
+        })
+        
     })
 })

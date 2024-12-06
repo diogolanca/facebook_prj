@@ -2,10 +2,11 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 
+from core.models import Post, FriendRequest
 from userauths.forms import UserRegistrationForm
 from userauths.models import Profile, User
 
@@ -76,4 +77,44 @@ def logout_view(request):
     if not request.user.is_authenticated:
         return redirect("userauths:sign-up")
 
+
+@login_required
+def my_profile(request):
+    profile = request.user.profile
+    posts = Post.objects.filter(active=True, user=request.user).order_by("-id")
+    context = {
+        "profile": profile,
+        "posts": posts
+    }
+    return render(request, "userauths/my-profile.html", context)
+
+
+@login_required
+def friend_profile(request, username):
+    profile = Profile.objects.get(user__username=username)
+    if request.user.profile == profile:
+        return redirect("userauths:my-profile")
+
+    posts = Post.objects.filter(active=True, user=profile.user).order_by("-id")
+    _bool = False
+    bool_friend = False
+    sender = request.user
+    receiver = profile.user
+
+    try:
+        friend_request = FriendRequest.objects.get(sender=sender, receiver=receiver)
+        if friend_request:
+            _bool = True
+        else:
+            _bool = False
+    except:
+        _bool = False
+
+    context = {
+        "profile": profile,
+        "posts": posts,
+        "bool": _bool,
+        "posts": posts
+    }
+    return render(request, "userauths/friend-profile.html", context)
 
