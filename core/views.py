@@ -7,9 +7,10 @@ from django.utils.text import slugify
 from django.utils.timesince import timesince
 from django.views.decorators.csrf import csrf_exempt
 from requests import post
-
+from rest_framework import viewsets
 from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage
 from userauths.models import User
+from .serializers import PostSerializer
 
 
 noti_new_like = "New Like"
@@ -24,7 +25,8 @@ noti_friend_request_accepted = "Friend Request Accepted"
 def index(request):
     posts = Post.objects.filter(active=True, visibility="Everyone").order_by("-id")
     context = {"posts": posts}
-    return render(request, "core/index.html", context)
+    print(context)
+    return JsonResponse(context, safe=False)
 
 
 @login_required
@@ -34,37 +36,47 @@ def post_detail(request, slug):
     return render(request, "core/post-detail.html", context)
 
 
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+
 def send_notification(user=None, sender=None, post=None, comment=None, notification_type=None):
-    notification = Notification.objects.create(
+    return Notification.objects.create(
         user=user,
         sender=sender,
         post=post,
         comment=comment,
         notification_type=notification_type,
     )
-    return notification
 
 
 @csrf_exempt
 def create_post(request):
-    if request.method == "POST":
-        title = request.POST.get("post-caption")
-        visibility = request.POST.get("visibility")
-        image = request.FILES.get("post-thumbnail")
+    if request.method != "POST":
+        return
+    title = request.POST.get("post-caption")
+    visibility = request.POST.get("visibility")
+    image = request.FILES.get("post-thumbnail")
 
-        uuid_key = shortuuid.uuid()
-        uniqueid = uuid_key[:4]
+    uuid_key = shortuuid.uuid()
+    uniqueid = uuid_key[:4]
 
-        if title and image:
-            post = Post(title=title, image=image, visibility=visibility, user=request.user,
-                        slug=slugify(title) + "-" + str(uniqueid.lower()))
-            post.save()
-            return JsonResponse({"post": {"title": post.title, "image_url ": post.image.url,
-                                          "full_name": post.user.profile.full_name,
-                                          "profile_image": post.user.profile.image.url,
-                                          "date": timesince(post.date), "id": post.id}})
-        else:
-            return JsonResponse({"error": "Image or title does not exist"})
+    if title and image:
+        post = Post(
+            title=title,
+            image=image,
+            visibility=visibility,
+            user=request.user,
+            slug=f"{slugify(title)}-{str(uniqueid.lower())}",
+        )
+        post.save()
+        return JsonResponse({"post": {"title": post.title, "image_url ": post.image.url,
+                                      "full_name": post.user.profile.full_name,
+                                      "profile_image": post.user.profile.image.url,
+                                      "date": timesince(post.date), "id": post.id}})
+    else:
+        return JsonResponse({"error": "Image or title does not exist"})
 
 
 def like_post(request):
@@ -109,7 +121,7 @@ def comment_on_post(request):
         "date": timesince(new_comment.date),
         "comment_id": new_comment.id,
         "post_id": new_comment.post.id,
-        "comment_count": comment_count + int(1)
+        "comment_count": comment_count + 1,
     }
     return JsonResponse({"data": data})
 

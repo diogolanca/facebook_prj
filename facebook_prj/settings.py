@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import django_heroku
 import dj_database_url
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,6 +160,16 @@ AUTH_USER_MODEL = "userauths.User"
 LOGIN_REDIRECT_URL = 'core:feed'
 LOGOUT_REDIRECT_URL = 'userauths:sign-up'
 LOGIN_URL = 'userauths:sign-up'
+
+class DisableMigrations:
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return None
+
+if 'test' in sys.argv:
+    MIGRATION_MODULES = DisableMigrations()
 
 JAZZMIN_SETTINGS = {
     'site_header': "Facebook Clone",

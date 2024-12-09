@@ -1,0 +1,65 @@
+/* Layout da HomePage */
+.homepage-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  /* Sidebar Geral */
+  .sidebar {
+    flex: 1;
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar h3 {
+    color: #0057b7;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar ul li {
+    padding: 5px 0;
+    font-size: 0.9rem;
+    color: #333;
+  }
+  
+  /* Feed Principal */
+  .feed {
+    flex: 2;
+  }
+  
+  .feed h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .post {
+    background-color: #ffffff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .post h4 {
+    font-size: 1.2rem;
+    color: #0057b7;
+    margin-bottom: 10px;
+  }
+  
+  .post p {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  

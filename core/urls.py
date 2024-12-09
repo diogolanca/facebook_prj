@@ -1,7 +1,10 @@
 from django.urls import path
 from core import views
+from rest_framework.routers import DefaultRouter
 
 app_name = "core"
+
+router = DefaultRouter()
 
 urlpatterns = [
     path("", views.index, name="feed"),
