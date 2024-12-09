@@ -43,23 +43,58 @@
     color: #333;
     margin-bottom: 15px;
   }
-  
-  .post {
-    background-color: #ffffff;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .post h4 {
-    font-size: 1.2rem;
-    color: #0057b7;
-    margin-bottom: 10px;
-  }
-  
-  .post p {
-    font-size: 0.9rem;
-    color: #555;
-  }
-  
+
+ /* Estilo para o container do post */
+.post {
+  background-color: #ffffff; /* Fundo branco */
+  border-radius: 10px; /* Bordas arredondadas */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra leve */
+  margin-bottom: 20px; /* Espaçamento entre posts */
+  padding: 15px; /* Espaçamento interno */
+}
+
+/* Header do post (quem postou e data) */
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.post-header img {
+  width: 40px; /* Tamanho da imagem de perfil */
+  height: 40px; /* Tamanho da imagem de perfil */
+  border-radius: 50%; /* Torna a imagem circular */
+  margin-right: 10px; /* Espaçamento à direita da imagem */
+}
+
+.post-header .author-info {
+  font-size: 0.9rem;
+  color: #333; /* Texto escuro */
+}
+
+.post-header .author-info span {
+  display: block;
+  font-weight: bold; /* Nome em negrito */
+}
+
+.post-header .author-info small {
+  color: #999; /* Texto mais claro para a data */
+}
+
+/* Conteúdo do post */
+.post-content {
+  margin-top: 10px;
+}
+
+.post-content img {
+  max-width: 100%; /* Garante que a imagem não ultrapasse o container */
+  height: auto; /* Mantém a proporção da imagem */
+  border-radius: 10px; /* Bordas arredondadas */
+  margin-top: 10px; /* Espaçamento entre texto e imagem */
+}
+
+.post-content p {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 10px;
+}

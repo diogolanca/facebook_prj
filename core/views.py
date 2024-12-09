@@ -2,6 +2,7 @@ import shortuuid
 from django.contrib.auth.decorators import login_required
 from django.db.models import Subquery, Q, OuterRef
 from django.http import JsonResponse
+from django.views.decorators.cache import cache_control
 from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.utils.timesince import timesince
@@ -21,12 +22,24 @@ noti_comment_liked = "Comment Liked"
 noti_comment_replied = "Comment Replied"
 noti_friend_request_accepted = "Friend Request Accepted"
 
-@login_required
 def index(request):
-    posts = Post.objects.filter(active=True, visibility="Everyone").order_by("-id")
-    context = {"posts": posts}
-    print(context)
-    return JsonResponse(context, safe=False)
+    posts = Post.objects.all().select_related('user').order_by('-date')
+    posts_data = [
+        {
+            'id': post.id,
+            'title': post.title,
+            'image_url': request.build_absolute_uri(post.image.url) if post.image else None,
+            'user': {
+                'id': post.user.id,
+                'username': post.user.username,
+                'image': request.build_absolute_uri(post.user.profile.image.url) if post.user.profile and post.user.profile.image else None,
+            },
+            'created_at': post.date,
+        }
+        for post in posts
+    ]
+    print(posts_data)
+    return JsonResponse(posts_data, safe=False)
 
 
 @login_required

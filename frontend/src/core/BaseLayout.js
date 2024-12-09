@@ -1,5 +1,7 @@
 import React from 'react';
 import './layouts/BaseLayout.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome, faUser, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 function BaseLayout({ children }) {
   return (
@@ -9,9 +11,24 @@ function BaseLayout({ children }) {
         <h1>What I Want</h1>
         <nav>
           <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/profile">Profile</a></li>
-            <li><a href="/messages">Messages</a></li>
+            <li>
+              <a href="/">
+                <FontAwesomeIcon icon={faHome} className="nav-icon" />
+                Home
+              </a>
+            </li>
+            <li>
+              <a href="/profile">
+                <FontAwesomeIcon icon={faUser} className="nav-icon" />
+                Profile
+              </a>
+            </li>
+            <li>
+              <a href="/messages">
+                <FontAwesomeIcon icon={faEnvelope} className="nav-icon" />
+                Messages
+              </a>
+            </li>
           </ul>
         </nav>
       </header>
