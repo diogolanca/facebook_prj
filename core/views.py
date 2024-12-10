@@ -12,6 +12,8 @@ from rest_framework import viewsets
 from core.models import Post, Comment, ReplyComment, Friend, FriendRequest, Notification, ChatMessage
 from userauths.models import User
 from .serializers import PostSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
 noti_new_like = "New Like"
@@ -22,6 +24,8 @@ noti_comment_liked = "Comment Liked"
 noti_comment_replied = "Comment Replied"
 noti_friend_request_accepted = "Friend Request Accepted"
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def index(request):
     posts = Post.objects.all().select_related('user').order_by('-date')
     posts_data = [

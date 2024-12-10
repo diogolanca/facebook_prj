@@ -3,7 +3,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect
 
 from core.models import Post, FriendRequest
@@ -13,8 +13,7 @@ from userauths.models import Profile, User
 
 def register_view(request):
     if request.user.is_authenticated:
-        messages.warning(request, "You are registered!")
-        return redirect("core:feed")
+        return JsonResponse({'error': "You are already registered!"}, status=400)
 
     form = UserRegistrationForm(request.POST or None)
     if form.is_valid():
@@ -27,23 +26,18 @@ def register_view(request):
         user = authenticate(email=email, password=password)
         login(request, user)
 
-        messages.success(request, f"Hi {full_name}. Your account was created successfully.")
         profile = Profile.objects.get(user=request.user)
         profile.full_name = full_name
         profile.phone = phone
         profile.save()
-        return redirect("core:feed")
+        return JsonResponse({'message': f"Hi {full_name}. Your account was created successfully."}, status=201)
 
-    context = {
-        "form": form
-    }
-    return render(request, "userauths/sign-up.html", context)
+    return JsonResponse({'error': form.errors}, status=400)
 
 
 def login_view(request):
     if request.user.is_authenticated:
-        messages.warning(request, "You are already logged in!")
-        return redirect("core:feed")
+        return JsonResponse({'error': "You are already logged in!"}, status=400)
     if request.method == "POST":
         name = request.POST.get("email")
         password = request.POST.get("password")
@@ -55,20 +49,17 @@ def login_view(request):
                 if len(login_user) > 0:
                     user = authenticate(username=login_user[0].email, password=password)
                 else:
-                    messages.error(request, "Wrong Username or password")
-                    return redirect("userauths:sign-up")
+                    return JsonResponse({'error': "Wrong username or password"}, status=400)
             if user is not None:
                 login(request, user)
-                return redirect("core:feed")
+                return JsonResponse({'message': "Login successful"}, status=200)
             else:
-                messages.error(request, "Wrong Username or password")
-                return redirect("userauths:sign-up")
+                return JsonResponse({'error': "Wrong username or password"}, status=400)
         except Exception as ex:
             print(ex)
-            messages.error(request, "Something went wrong please try again in a few minutes.")
-            return redirect("userauths:sign-up")
+            return JsonResponse({'error': "Something went wrong. Please try again."}, status=500)
 
-    return HttpResponseRedirect("/")
+    return JsonResponse({'error': "Invalid request method"}, status=405)
 
 
 def logout_view(request):
